@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: my-apps
+spec:
+  destination:
+    namespace: default
+    server: 'https://kubernetes.default.svc/'
+  source:
+    path: argo-cd/apps
+    repoURL: 'git@github.com:AlxFrst/k8s-app.git'
+    targetRevision: HEAD
+    directory:
+      recurse: true
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
