@@ -27,7 +27,7 @@ metadata:
     app.kubernetes.io/version: "ce-latest-ee-2.19.4"
     app.kubernetes.io/managed-by: Helm
 spec:
-  storageClassName: nfs-client-storage-01
+  storageClassName: nfs-client-storage-1
   accessModes:
     - "ReadWriteOnce"
   resources:
