@@ -5,7 +5,7 @@ metadata:
 spec:
   destination:
     namespace: default
-    server: 'https://kubernetes.default.svc/'
+    server: 'https://kubernetes.default.svc'
   source:
     path: argo-cd/apps
     repoURL: 'git@github.com:AlxFrst/k8s-app.git'
