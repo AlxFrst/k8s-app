@@ -16,7 +16,7 @@ spec:
                 fsGroup: 33
             containers:
                 - name: itop
-                  image: itsmfactory/itoppro:3.1.1-1-pro-12564
+                  image: itsmfactory/itop:3.1.1-1
                   imagePullPolicy: Always
                   ports:
                       - containerPort: 80
