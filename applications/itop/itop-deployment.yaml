@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: itop-deployment
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: itop
+    template:
+        metadata:
+            labels:
+                app: itop
+        spec:
+            securityContext:
+                fsGroup: 33
+            containers:
+                - name: itop
+                  image: itsmfactory/itoppro:3.1.1-1-pro-12564
+                  imagePullPolicy: Always
+                  ports:
+                      - containerPort: 80
+                  volumeMounts:
+                      - name: conf-volume
+                        mountPath: /var/www/html/itop/conf
+                      - name: data-volume
+                        mountPath: /var/www/html/itop/data
+                      - name: env-production-volume
+                        mountPath: /var/www/html/itop/env-production
+                      - name: log-volume
+                        mountPath: /var/www/html/itop/log
+                      - name: extension-volume
+                        mountPath: /var/www/html/itop/extensions
+            imagePullSecrets:
+                - name: itsm-dockerhub-secret
+            volumes:
+                - name: conf-volume
+                  persistentVolumeClaim:
+                      claimName: itop-conf-pvc
+                - name: data-volume
+                  persistentVolumeClaim:
+                      claimName: itop-data-pvc
+                - name: env-production-volume
+                  persistentVolumeClaim:
+                      claimName: itop-env-pvc
+                - name: log-volume
+                  persistentVolumeClaim:
+                      claimName: itop-log-pvc
+                - name: extension-volume
+                  persistentVolumeClaim:
+                      claimName: itop-extensions-pvc
+                

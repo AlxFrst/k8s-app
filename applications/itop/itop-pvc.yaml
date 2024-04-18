@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    name: itop-conf-pvc
+spec:
+    storageClassName: nfs-client-storage-1
+    accessModes:
+        - ReadWriteMany
+    resources:
+        requests:
+            storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    name: itop-data-pvc
+spec:
+    storageClassName: nfs-client-storage-1
+    accessModes:
+        - ReadWriteMany
+    resources:
+        requests:
+            storage: 5Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    name: itop-env-pvc
+spec:
+    storageClassName: nfs-client-storage-1
+    accessModes:
+        - ReadWriteMany
+    resources:
+        requests:
+            storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    name: itop-log-pvc
+spec:
+    storageClassName: nfs-client-storage-1
+    accessModes:
+        - ReadWriteMany
+    resources:
+        requests:
+            storage: 1Gi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    name: itop-extensions-pvc
+spec:
+    storageClassName: nfs-client-storage-1
+    accessModes:
+        - ReadWriteMany
+    resources:
+        requests:
+            storage: 1Gi
