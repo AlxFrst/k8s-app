@@ -1,0 +1,160 @@
+---
+# Source: portainer/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: portainer-sa-clusteradmin
+  namespace: portainer
+  labels:
+    helm.sh/chart: portainer-1.0.49
+    app.kubernetes.io/name: portainer
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "ce-latest-ee-2.19.4"
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: portainer/templates/pvc.yaml
+kind: "PersistentVolumeClaim"
+apiVersion: "v1"
+metadata:
+  name: release-name-portainer
+  namespace: portainer
+  annotations:
+  labels:
+    io.portainer.kubernetes.application.stack: portainer
+    helm.sh/chart: portainer-1.0.49
+    app.kubernetes.io/name: portainer
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "ce-latest-ee-2.19.4"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  storageClassName: nfs-client-storage-1
+  accessModes:
+    - "ReadWriteOnce"
+  resources:
+    requests:
+      storage: "10Gi"
+---
+# Source: portainer/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: release-name-portainer
+  labels:
+    helm.sh/chart: portainer-1.0.49
+    app.kubernetes.io/name: portainer
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "ce-latest-ee-2.19.4"
+    app.kubernetes.io/managed-by: Helm
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  namespace: portainer
+  name: portainer-sa-clusteradmin
+---
+# Source: portainer/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: release-name-portainer
+  namespace: portainer
+  labels:
+    io.portainer.kubernetes.application.stack: portainer
+    helm.sh/chart: portainer-1.0.49
+    app.kubernetes.io/name: portainer
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "ce-latest-ee-2.19.4"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 9000
+      targetPort: 9000
+      protocol: TCP
+      name: http
+      nodePort: 30777
+    - port: 9443
+      targetPort: 9443
+      protocol: TCP
+      name: https
+      nodePort: 30779
+    - port: 30776
+      targetPort: 30776
+      protocol: TCP
+      name: edge
+      nodePort: 30776
+  selector:
+    app.kubernetes.io/name: portainer
+    app.kubernetes.io/instance: release-name
+---
+# Source: portainer/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: release-name-portainer
+  namespace: portainer
+  labels:
+    io.portainer.kubernetes.application.stack: portainer
+    helm.sh/chart: portainer-1.0.49
+    app.kubernetes.io/name: portainer
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "ce-latest-ee-2.19.4"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  strategy:
+    type: "Recreate"
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: portainer
+      app.kubernetes.io/instance: release-name
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: portainer
+        app.kubernetes.io/instance: release-name
+    spec:
+      nodeSelector:
+        {}
+      serviceAccountName: portainer-sa-clusteradmin
+      volumes:
+        - name: "data"
+          persistentVolumeClaim:
+            claimName: release-name-portainer
+      containers:
+        - name: portainer
+          image: "portainer/portainer-ce:2.19.4"
+          imagePullPolicy: Always
+          args:
+          - '--tunnel-port=30776'
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          ports:
+            - name: http
+              containerPort: 9000
+              protocol: TCP
+            - name: https
+              containerPort: 9443
+              protocol: TCP
+            - name: tcp-edge
+              containerPort: 8000
+              protocol: TCP
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 45
+            httpGet:
+              path: /
+              port: 9443
+              scheme: HTTPS
+          readinessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 45
+            httpGet:
+              path: /
+              port: 9443
+              scheme: HTTPS
+          resources:
+            {}
